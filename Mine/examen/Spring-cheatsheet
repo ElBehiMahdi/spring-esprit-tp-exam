@@ -1,0 +1,422 @@
+Spring-cheatsheet
+
+Spring starter : 
+	spring data JPA
+	mysql driver
+	spring web 
+	swagger
+
+
+First entity :
+
+	@Entity
+	@Table( name = "Client")
+	public class Client implements Serializable{
+		
+		@Id
+		@GeneratedValue (strategy = GenerationType.IDENTITY //l'option AUTO-INCREMENT) 
+		//Strategy = GenerationType.AUTO 
+		//Strategy = GenerationType.TABLE
+		//Strategy = GenerationType.SEQUENCE
+
+		@Column(name="idClient")
+		private Long idClient; // Clé primaire
+
+		private String nom; 
+		private String prenom; 
+		private String email; 
+		private String password; 
+		
+		@Temporal(TemporalType.DATE)
+		private Date dateNaissance;
+		
+		@Enumerated(EnumType.STRING)
+		private Profession profession;
+		
+		@Enumerated(EnumType.STRING)
+		private CategorieClient categorieClient;
+		
+		// TIME : 30-09-19 10:50:56.780000000 AM 
+		// DATE : 30-09-19 
+		// TIMESTAMP : 1569840656 (nbre de secondes entre 01/01/1970 et la date voulue) 
+		@Temporal (TemporalType.DATE)
+		private Date dateDebut; 
+
+		//Constructeur et accesseurs (getters) et mutateurs (setters) 
+	}
+
+Insert a date in the table :
+
+	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	Date dateDebut = dateFormat.parse("30/09/2019");
+
+Enum entity : 
+	
+	public enum Domaine{
+		math, informatique, biology
+	}
+
+Fichier properties : 
+
+	#Server configuration
+ 	server.port=8089
+ 	server.servlet.context-path=/SpringMVC
+
+	#logging configuration
+	# Spécifier le fichier externe ou les messages sont stockés
+	logging.file=D:/spring_log_file.log 
+	# Spécifier la taille maximale du fichier de journalisation
+	logging.file.max-size= 100KB
+	# spécifier le niveau de Log
+	logging.level.root=INFO 
+	# Spécifier la forme du message
+	logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %-5level - %logger{36} - %msg%n
+
+	### DATABASE ###
+	#spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+	spring.datasource.url=jdbc:mysql://localhost:3306/springDB?useUnicode=true&use
+	JDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+	spring.datasource.username=root
+	spring.datasource.password=
+
+	### JPA / HIBERNATE ###
+	spring.jpa.show-sql=true
+	spring.jpa.hibernate.ddl-auto=update
+	spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+	
+
+Entity associations : 
+	One to one : 
+		One to one unidirectionelle 1 -> 1 :
+
+			T_FORMATION (1)-->(1) T_FORMATION_DETAIL
+
+				@Entity
+				@Table(name = "T_FORMATION")
+				public class Formation implements Serializable {
+
+					@OneToOne
+					private FormationDetail formationDetail;
+				}
+
+
+				@Entity
+				@Table(name="T_FORMATION_DETAIL")
+				public class FormationDetail implements Serializable {}
+
+		One to one bidirectionelle 1 - 1 : 
+
+			T_FORMATION (1)-(1) T_FORMATION_DETAIL
+
+				@Entity
+				@Table(name = "T_FORMATION")
+				public class Formation implements Serializable {
+
+					@OneToOne
+					private FormationDetail formationDetail;
+				}
+
+				@Entity
+				@Table(name="T_FORMATION_DETAIL")
+				public class FormationDetail implements Serializable {
+
+					@OneToOne(mappedBy="formationDetail")
+					private Formation formation; 
+				}
+
+	One to many : 
+		Unidirectionnelle :
+
+			T_TP (1) --> (*) T_TP_CORRECTION
+
+				@Entity
+				@Table(name = "T_TP")
+				public class TravauxPratiques implements Serializable {
+
+					@OneToMany(cascade = CascadeType.ALL)
+					private Set<TpCorrection> TpCorrections;
+				}
+
+				@Entity
+				@Table(name="T_TP_CORRECTION")
+				public class TpCorrection implements Serializable {}
+
+		Bidirectionnelle :
+
+			T_TP (1)-(*) T_TP_CORRECTION
+
+				@Entity
+				@Table(name = "T_TP")
+				public class TravauxPratiques implements Serializable {
+
+					@OneToMany(cascade = CascadeType.ALL, mappedBy="travauxPratiques")
+					private Set<TpCorrection> TpCorrections;
+
+				}
+
+				@Entity
+				@Table(name="T_TP_CORRECTION")
+				public class TpCorrection implements Serializable {
+
+					@ManyToOne
+					TravauxPratiques travauxPratiques;
+				}
+
+	Many to one : 
+		Unidirectionnelle :
+
+			T_TP_CORRECTION (1) --> (*) T_TP
+
+				@Entity
+				@Table(name = "T_TP_CORRECTION")
+				public class TpCorrection implements Serializable {
+
+					@ManyToOne(cascade = CascadeType.ALL)
+					TravauxPratiques travauxPratiques; 
+				}
+
+				@Entity
+				@Table(name="T_TP")
+				public class TravauxPratiques implements Serializable {}
+
+		Bidirectionnelle :
+
+			T_TP_CORRECTION (1)-(*) T_TP
+
+				@Entity
+				@Table(name = "T_TP_CORRECTION")
+				public class TpCorrection implements Serializable {
+
+					@ManyToOne
+					TravauxPratiques travauxPratiques; 
+
+				}
+
+				@Entity
+				@Table(name="T_TP")
+				public class TravauxPratiques implements Serializable {
+
+					@OneToMany(cascade = CascadeType.ALL, mappedBy="travauxPratiques")
+					private Set<TpCorrection> TpCorrections;
+
+				}
+
+
+	Many to many : 
+		Unidirectionnelle :
+
+			T_FORMATION (*) --> (*) T_TP
+
+				@Entity
+				@Table(name = "T_FORMATION")
+				public class Formation implements Serializable {
+
+					@ManyToMany(cascade = CascadeType.ALL) 
+					private Set<TravauxPratiques> formationTps;
+				}
+
+				@Entity
+				@Table(name="T_TP")
+				public class TravauxPratiques implements Serializable {}
+
+		Bidirectionnelle :
+
+			T_FORMATION (*)-(*) T_TP
+
+				@Entity
+				@Table(name = "T_FORMATION")
+				public class Formation implements Serializable {
+
+					@ManyToMany(cascade = CascadeType.ALL) 
+					private Set<TravauxPratiques> formationTps; 
+
+				}
+
+				@Entity
+				@Table(name="T_TP")
+				public class TravauxPratiques implements Serializable {
+
+					@ManyToMany(mappedBy="formationTps", cascade = CascadeType.ALL) 
+					private Set<Formation> formations;
+
+				}
+
+Repository package and interfaces : 
+
+	public interface TestRepository extends JPARepository<entity_name, Long>{
+
+		//JPQL queries here to use in services
+	}
+
+Service package and services : 
+
+	Service interface : 
+
+		public interface TestService {
+
+			//Crud fonctions parameters
+			List<Client> retrieveAllClients();
+			Client addClient(Client c);
+			void deleteClient(Long id);
+			Client updateClient(Client c);
+			Client retrieveClient(Long id);
+		}
+
+	Service implement : 
+
+		@Service
+		public class TestServiceImpl implements TestService {
+
+		@Autowired
+		TestRepository testRepository;
+
+		//Crud fonctions implementations using repositories and logic
+
+		}
+
+JPQL queries : 
+
+	SELECT : 
+
+		récupérer les clients qui ont une profession donné
+
+		@Query("SELECT c FROM Client c WHERE c.profession= :profession")
+		List<Client> retrieveClientsByProfession(@Param("profession") Profession profession);
+	
+	UPDATE :
+
+		mettre à jour la categorie Client en fonction de la profession
+
+		@Modifying
+		@Query("update Client c set c.categorieClient = :categorie where u.profession = :profession")
+		int updateClientCategorieByProfession(@Param("categorie") CategorieClient categorieClient, @Param("profession") Profession profession);
+	
+	DELETE :
+
+		supprimer les clients qui ont une profession et une catégorie client donnés
+
+		@Modifying
+		@Query(“DELETE FROM Client c WHERE c.categorieClient= :categorie AND c.profession = :profession")
+		int deleteClientByCategorieClientAndProfession(@Param("categorie") 
+		CategorieClient categorieClient, @Param("profession") Profession profession);
+
+	INSERT :
+
+		insérer des utilisateurs dans la table Client
+
+		@Modifying
+		@Query(value = "INSERT INTO Client (nom, prenom, dateNaissance,email,password,profession,categorieClient) VALUES (:nom, :prenom, :dateN, :email, :password, :profession, :categorieClient)", nativeQuery = true)
+
+		void insertClient(
+		@Param(”nom") String nom, 
+		@Param(”prenom") String prenom, 
+		@Param(”dateN") Date dateNaissance, 
+		@Param(”email") String email, 
+		@Param(”password") String password,
+		@Param(”profession") Profession profession,
+		@Param(”categorieClient") CategorieClient categorieClient);
+
+REST Controllers : 
+
+	@RestController
+ 	@RequestMapping("/client")
+ 	public class ClientRestController {
+
+		@Autowired
+		IClientService clientService;
+		 
+
+		//http://localhost:8089/SpringMVC/client/retrieve-all-clients
+		 
+		@GetMapping("/retrieve-all-clients")
+		@ResponseBody
+		public List<Client> getClients() {
+		List<Client> listClients = clientService.retrieveAllClients();
+		return listClients;
+
+		// http://localhost:8089/SpringMVC/client/retrieve-client/8 
+		@GetMapping("/retrieve-client/{client-id}")
+		@ResponseBody
+		public Client retrieveClient(@PathVariable("client-id") Long clientId) {
+		return clientService.retrieveClient(clientId);
+		}
+		 
+		// http://localhost:8089/SpringMVC/client/add-client
+		@PostMapping("/add-client")
+		@ResponseBody
+		public Client addClient(@RequestBody Client c) {
+			Client client = clientService.addClient(c);
+			return client
+		}
+
+		// http://localhost:8089/SpringMVC/client/remove-client/{client-id}
+ 		@DeleteMapping("/remove-client/{client-id}")
+ 		@ResponseBody
+ 		public void removeClient(@PathVariable("client-id") Long clientId) {
+ 			clientService.deleteClient(clientId);
+ 		}
+
+ 		// http://localhost:8089/SpringMVC/client/modify-client
+ 		@PutMapping("/modify-client")
+ 		@ResponseBody
+ 		public Client modifyClient(@RequestBody Client client) {
+ 			return clientService.updateClient(client);
+ 		}
+ 	}
+
+Swagger integration for testing : 
+
+	@EnableSwagger2 <--- dans la class main
+	@SpringbootApplication 
+
+	configuration package containing SwaggerConfig class:
+
+		@Configuration
+		public class SwaggerConfig {
+			@Bean
+			public Docket api() {
+				return new Docket(DocumentationType.SWAGGER_2)
+				.select()
+		 		.apis(RequestHandlerSelectors.any())
+		 		.paths(PathSelectors.any())
+		 		.build();
+		 }
+		}
+
+	test swagger by inputing : http://localhost:8089/SpringMVC/v2/api-docs
+
+	test swagger ui : http://localhost:8089/SpringMVC/swagger-ui/index.html
+ 
+	Informations personnalisées : 
+
+		in config file :
+
+			@Bean
+			public Docket api() {
+				return new Docket(DocumentationType.SWAGGER_2)
+			 	...
+			 	.build().apiInfo(apiInfo());
+			}
+
+			private ApiInfo apiInfo () {
+				return new ApiInfoBuilder()
+				.title("Swagger Configuration for tpStockProject")
+				.description("\"Spring Boot Swagger configuration\"")
+				.version("1.1.0").build();
+			}
+
+	API tags in REST controller :
+
+		@RestController
+		@Api(tags = "Client management") <---
+		@RequestMapping("/client")
+		public class RestController {
+
+			...
+			@ResponseBody
+			@GetMapping('...')
+			@ApiOperation(value = "Récupérer la liste des clients") <---
+
+		} 
+
+

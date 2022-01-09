@@ -1,0 +1,130 @@
+JPQL queries :
+
+	SELECT :
+
+        //Compter nombre d'employees
+
+            @Query("SELECT count(*) FROM Employe")
+            public int countemp();
+
+
+
+        //Lister les noms des employees
+
+            @Query("SELECT nom FROM Employe")
+            public List<String> employeNames();
+
+
+
+        //Lister les employers par entreprise
+
+            @Query("Select "
+                    + "DISTINCT emp from Employe emp "
+                    + "join emp.departements dps  "
+                    + "where dps.entreprise=:entreprise")
+            public List<Employe> getAllEmployeByEntreprisec(@Param("entreprise") Entreprise entreprise);
+
+
+
+	    //Get project by user id
+
+            @Query("SELECT p FROM Project p join p.users u where u.id = :id")
+            List<Project> projectByUser(@Param("id") int id);
+
+
+
+        //Afficher tout les employees par mission id
+
+        	@Query("select DISTINCT e from Employe e "
+        				+ "join e.timesheets t "
+        				+ "join t.mission m "
+        				+ "where m.id=:misId")
+        	public List<Employe> getAllEmployeByMission(@Param("misId")int missionId);
+
+
+
+        //Recuperer salaire d'un contrat d'un employer de l'id saisie
+
+        	@Query("select c.salaire from Contrat c join c.employe e where e.id=:employeId")
+            public float getSalaireByEmployeIdJPQL(@Param("employeId")int employeId);
+
+
+
+        //Recuperer salaire moyen des contrat employers par chaque departement
+
+        	@Query("Select "
+        			+ "DISTINCT AVG(cont.salaire) from Contrat cont "
+        			+ "join cont.employe emp "
+        			+ "join emp.departements deps "
+        			+ "where deps.id=:depId")
+            public Double getSalaireMoyenByDepartementId(@Param("depId")int departementId);
+
+
+
+        //Afficher les missions d'un employee
+
+        	@Query("select DISTINCT m from Mission m join m.timesheets t join t.employe e where e.id=:employeId")
+        	public List<Mission> findAllMissionByEmployeJPQL(@Param("employeId")int employeId);
+
+
+
+		//Récupérer les clients qui ont une profession donné
+
+		@Query("SELECT c FROM Client c WHERE c.profession= :profession")
+		List<Client> retrieveClientsByProfession(@Param("profession") Profession profession);
+
+
+
+	UPDATE :
+
+        //Mise a jour email d'un employer par id
+
+            @Modifying
+            @Transactional
+            @Query("UPDATE Employe e SET e.email=:email1 where e.id=:employeId")
+            public void mettreAjourEmailByEmployeIdJPQL(@Param("email1")String email, @Param("employeId")int employeId);
+
+
+		//Mettre à jour la categorie Client en fonction de la profession
+
+            @Modifying
+            @Query("update Client c set c.categorieClient = :categorie where u.profession = :profession")
+            int updateClientCategorieByProfession(@Param("categorie") CategorieClient categorieClient, @Param("profession") Profession profession);
+
+
+
+	DELETE :
+
+        //Effacer tout les contrats
+
+            @Modifying
+            @Transactional
+            @Query("DELETE from Contrat")
+            public void deleteAllContratJPQL();
+
+
+
+		//Supprimer les clients qui ont une profession et une catégorie client donnés
+
+            @Modifying
+            @Query(“DELETE FROM Client c WHERE c.categorieClient= :categorie AND c.profession = :profession")
+            int deleteClientByCategorieClientAndProfession(@Param("categorie")
+            CategorieClient categorieClient, @Param("profession") Profession profession);
+
+
+
+	INSERT :
+
+		//Insérer des utilisateurs dans la table Client
+
+            @Modifying
+            @Query(value = "INSERT INTO Client (nom, prenom, dateNaissance,email,password,profession,categorieClient) VALUES (:nom, :prenom, :dateN, :email, :password, :profession, :categorieClient)", nativeQuery = true)
+
+            void insertClient(
+            @Param(”nom") String nom,
+            @Param(”prenom") String prenom,
+            @Param(”dateN") Date dateNaissance,
+            @Param(”email") String email,
+            @Param(”password") String password,
+            @Param(”profession") Profession profession,
+            @Param(”categorieClient") CategorieClient categorieClient);
