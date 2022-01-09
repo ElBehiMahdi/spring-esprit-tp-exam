@@ -1,12 +1,15 @@
+Spring-cheatsheet
+
 Spring starter :
 	spring data JPA
 	mysql driver
 	spring web
+	spring fox :
 	lombok
 
 First entity :
-	
-	if you are using lombok : 
+
+	if you are using lombok :
 		@Getter
 		@Setter
 		@AllArgsConstructor
@@ -16,37 +19,37 @@ First entity :
 	@Entity
 	@Table( name = "Client")
 	public class Client implements Serializable{
-		
+
 		@Id
-		@GeneratedValue (strategy = GenerationType.IDENTITY //l'option AUTO-INCREMENT) 
-		//Strategy = GenerationType.AUTO 
+		@GeneratedValue (strategy = GenerationType.IDENTITY //l'option AUTO-INCREMENT)
+		//Strategy = GenerationType.AUTO
 		//Strategy = GenerationType.TABLE
 		//Strategy = GenerationType.SEQUENCE
 
 		@Column(name="idClient")
 		private Long idClient; // Clé primaire
 
-		private String nom; 
-		private String prenom; 
-		private String email; 
-		private String password; 
-		
+		private String nom;
+		private String prenom;
+		private String email;
+		private String password;
+
 		@Temporal(TemporalType.DATE)
 		private Date dateNaissance;
-		
+
 		@Enumerated(EnumType.STRING)
 		private Profession profession;
-		
+
 		@Enumerated(EnumType.STRING)
 		private CategorieClient categorieClient;
-		
-		// TIME : 30-09-19 10:50:56.780000000 AM 
-		// DATE : 30-09-19 
-		// TIMESTAMP : 1569840656 (nbre de secondes entre 01/01/1970 et la date voulue) 
-		@Temporal (TemporalType.DATE)
-		private Date dateDebut; 
 
-		//Constructeur et accesseurs (getters) et mutateurs (setters) 
+		// TIME : 30-09-19 10:50:56.780000000 AM
+		// DATE : 30-09-19
+		// TIMESTAMP : 1569840656 (nbre de secondes entre 01/01/1970 et la date voulue)
+		@Temporal (TemporalType.DATE)
+		private Date dateDebut;
+
+		//Constructeur et accesseurs (getters) et mutateurs (setters)
 	}
 
 Insert a date in the table :
@@ -54,13 +57,13 @@ Insert a date in the table :
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	Date dateDebut = dateFormat.parse("30/09/2019");
 
-Enum entity : 
-	
+Enum entity :
+
 	public enum Domaine{
 		math, informatique, biology
 	}
 
-Fichier properties : 
+Fichier properties :
 
 	#Server configuration
  	server.port=8089
@@ -68,11 +71,11 @@ Fichier properties :
 
 	#logging configuration
 	# Spécifier le fichier externe ou les messages sont stockés
-	logging.file=D:/spring_log_file.log 
+	logging.file=D:/spring_log_file.log
 	# Spécifier la taille maximale du fichier de journalisation
 	logging.file.max-size= 100KB
 	# spécifier le niveau de Log
-	logging.level.root=INFO 
+	logging.level.root=INFO
 	# Spécifier la forme du message
 	logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %-5level - %logger{36} - %msg%n
 
@@ -89,9 +92,9 @@ Fichier properties :
 	spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
 	spring.mvc.pathmatch.matching-strategy=ant-path-matcher
 
-	
 
-Entity associations : 
+
+Entity associations :
 
 
 
@@ -114,7 +117,7 @@ Entity associations :
 				@Table(name="T_FORMATION_DETAIL")
 				public class FormationDetail implements Serializable {}
 
-		One to one bidirectionelle 1 - 1 : 
+		One to one bidirectionelle 1 - 1 :
 
 			T_FORMATION (1)-(1) T_FORMATION_DETAIL
 
@@ -131,7 +134,7 @@ Entity associations :
 				public class FormationDetail implements Serializable {
 
 					@OneToOne(mappedBy="formationDetail")
-					private Formation formation; 
+					private Formation formation;
 				}
 
 	ONE TO MANY :
@@ -182,7 +185,7 @@ Entity associations :
 				public class TpCorrection implements Serializable {
 
 					@ManyToOne(cascade = CascadeType.ALL)
-					TravauxPratiques travauxPratiques; 
+					TravauxPratiques travauxPratiques;
 				}
 
 				@Entity
@@ -198,7 +201,7 @@ Entity associations :
 				public class TpCorrection implements Serializable {
 
 					@ManyToOne
-					TravauxPratiques travauxPratiques; 
+					TravauxPratiques travauxPratiques;
 
 				}
 
@@ -221,7 +224,7 @@ Entity associations :
 				@Table(name = "T_FORMATION")
 				public class Formation implements Serializable {
 
-					@ManyToMany(cascade = CascadeType.ALL) 
+					@ManyToMany(cascade = CascadeType.ALL)
 					private Set<TravauxPratiques> formationTps;
 				}
 
@@ -237,8 +240,8 @@ Entity associations :
 				@Table(name = "T_FORMATION")
 				public class Formation implements Serializable {
 
-					@ManyToMany(cascade = CascadeType.ALL) 
-					private Set<TravauxPratiques> formationTps; 
+					@ManyToMany(cascade = CascadeType.ALL)
+					private Set<TravauxPratiques> formationTps;
 
 				}
 
@@ -246,14 +249,14 @@ Entity associations :
 				@Table(name="T_TP")
 				public class TravauxPratiques implements Serializable {
 
-					@ManyToMany(mappedBy="formationTps", cascade = CascadeType.ALL) 
+					@ManyToMany(mappedBy="formationTps", cascade = CascadeType.ALL)
 					private Set<Formation> formations;
 
 				}
 
 
 
-Repository package and interfaces : 
+Repository package and interfaces :
 
 	public interface TestRepository extends JPARepository<entity_name, Long/Integer>{
 		//JPQL queries here to use in services
@@ -261,9 +264,9 @@ Repository package and interfaces :
 
 
 
-Service package and services : 
+Service package and services :
 
-	Service interface : 
+	Service interface :
 
 		public interface TestService {
 
@@ -275,7 +278,7 @@ Service package and services :
 			Client retrieveClient(Long id);
 		}
 
-	Service implement : 
+	Service implement :
 
 		@Service
 		public class TestServiceImpl implements TestService {
@@ -289,7 +292,7 @@ Service package and services :
 
 
 
-REST Controllers : 
+REST Controllers :
 
 	@RestController
  	@RequestMapping("/client")
@@ -319,7 +322,7 @@ REST Controllers :
 		public Client retrieveClient(@PathVariable("client-id") Long clientId) {
 		return clientService.retrieveClient(clientId);
 		}
-		 
+
 		@PostMapping("/add-client")
 		@ResponseBody
 		public Client addClient(@RequestBody Client c) {
@@ -342,38 +345,99 @@ REST Controllers :
 
 
 
+ASPECTS :
+	**lombock is needed
+	in Service implement class : add this annotation from "import lombok.extern.slf4j.Slf4j";
+
+		@Slf4j
+		public class ServiceImpl implements Service{
+
+			public void getDataCenters(){
+		        for (Datacenter datacenter:listerDatacenter()){
+		            log.info("Data Center : "+datacenter.getRegion());
+		            for (VirtualMachine vm:datacenter.getVms()){
+		                log.info("OS :"+vm.getOs());
+		            }
+		        }
+		    }
+	    }
+
+    Aspect de Journalisation (logs) à la classe service StockService
+
+    package tn.esprit.esponline.config;
+	@Component
+	@Aspect
+	public class LoggingAspect {
+		private static final Logger l = LogManager.getLogger(LoggingAspect.class);
+
+		@Before("execution(* tn.esprit.esponline.service.StockServiceImpl.*(..))")
+		public void logMethodEntry(JoinPoint joinPoint) {
+			String name = joinPoint.getSignature().getName();
+			logger.info("In method " + name + " : ");
+		}
+		@After("….....")
+		public void logMethodExit….
+	}
+
+	classe PerformanceAspect, créer un aspect qui permet de calculer et afficher dans les logs, la durée
+	d’exécution de chaque méthode appelée de la couche service
+
+	@Around("execution(* tn.esprit.spring.service.*.*(..))")
+	public Object profile(ProceedingJoinPoint pjp) throws Throwable {
+		long start = System.currentTimeMillis();
+		Object obj = pjp.proceed();
+		long elapsedTime = System.currentTimeMillis() - start;
+		l.info("Method execution time: " + elapsedTime + " milliseconds.");
+		return obj;
+	}
 
 
 
+CRON :
+
+	0 * * * *	every hour
+	*/15 * * * *	every 15 mins
+	0 */2 * * *	every 2 hours
+	0 18 * * 0-6	every week Mon-Sat at 6pm
+	10 2 * * 6,7	every Sat and Sun on 2:10am
+	0 0 * * 0	every Sunday midnight
+
+	*	all values
+	,	separate individual values
+	-	a range of values
+	/	divide a value into steps
+
+	pour activer scheduling ajouter dans SpringbootApplication :
+
+		@EnableScheduling
+		@SpringBootApplication
+		public class TpStockProjectApplication {
+			public static void main(String[] args) {
+				SpringApplication.run(TpStockProjectApplication.class, args);
+			}
+		}
+
+		fixed rate execute les tache a des intervalles periodiques
+
+			@Scheduled(fixedRate = 60000)
+				public void fixedRateMethod() {
+				system.out.println("Method with fixed Rate");
+			}
+
+		fixed delay
+
+			@Scheduled(fixedDelay = 60000)
+				public void fixedDelayMethod() {
+				system.out.println("Method with fixed delay");
+			}
 
 
+			second(0-59) / minutes(059) / heure(0-23) / jour(0-31) / mois(0-12 or JAN-DEC) / jour de semaine (0-7 or MON-SUN)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			@Scheduled(cron = "*/60 * * * * *" )
+				public void cronMethod() {
+				system.out.println("Method with cron expression");
+			}
 
 
 
