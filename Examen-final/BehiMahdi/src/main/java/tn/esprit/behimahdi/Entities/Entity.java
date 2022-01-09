@@ -20,6 +20,7 @@ public class Entity implements Serializable {
     //Strategy = GenerationType.AUTO
     //Strategy = GenerationType.TABLE
     //Strategy = GenerationType.SEQUENCE
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //L'option AUTO-INCREMENT)
     @Column(name="idClient")

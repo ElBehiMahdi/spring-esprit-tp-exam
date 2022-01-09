@@ -345,6 +345,102 @@ REST Controllers :
 
 
 
+ASPECTS :
+	**lombock is needed 
+	in Service implement class : add this annotation from "import lombok.extern.slf4j.Slf4j";
+
+		@Slf4j
+		public class ServiceImpl implements Service{
+
+			public void getDataCenters(){
+		        for (Datacenter datacenter:listerDatacenter()){
+		            log.info("Data Center : "+datacenter.getRegion());
+		            for (VirtualMachine vm:datacenter.getVms()){
+		                log.info("OS :"+vm.getOs());
+		            }
+		        }
+		    }
+	    }
+
+    Aspect de Journalisation (logs) à la classe service StockService
+
+    package tn.esprit.esponline.config;
+	@Component
+	@Aspect
+	public class LoggingAspect {
+		private static final Logger l = LogManager.getLogger(LoggingAspect.class);
+		
+		@Before("execution(* tn.esprit.esponline.service.StockServiceImpl.*(..))")
+		public void logMethodEntry(JoinPoint joinPoint) {
+			String name = joinPoint.getSignature().getName();
+			logger.info("In method " + name + " : ");
+		}
+		@After("….....")
+		public void logMethodExit….
+	}
+
+	classe PerformanceAspect, créer un aspect qui permet de calculer et afficher dans les logs, la durée 
+	d’exécution de chaque méthode appelée de la couche service
+
+	@Around("execution(* tn.esprit.spring.service.*.*(..))")
+	public Object profile(ProceedingJoinPoint pjp) throws Throwable {
+		long start = System.currentTimeMillis(); 
+		Object obj = pjp.proceed(); 
+		long elapsedTime = System.currentTimeMillis() - start;
+		l.info("Method execution time: " + elapsedTime + " milliseconds.");
+		return obj; 
+	}
+
+
+
+CRON :
+
+	0 * * * *	every hour
+	*/15 * * * *	every 15 mins
+	0 */2 * * *	every 2 hours
+	0 18 * * 0-6	every week Mon-Sat at 6pm
+	10 2 * * 6,7	every Sat and Sun on 2:10am
+	0 0 * * 0	every Sunday midnight
+
+	*	all values
+	,	separate individual values
+	-	a range of values
+	/	divide a value into steps
+
+	pour activer scheduling ajouter dans SpringbootApplication :
+
+		@EnableScheduling
+		@SpringBootApplication
+		public class TpStockProjectApplication {
+			public static void main(String[] args) {
+				SpringApplication.run(TpStockProjectApplication.class, args);
+			}
+		}
+
+		fixed rate execute les tache a des intervalles periodiques 
+
+			@Scheduled(fixedRate = 60000)
+				public void fixedRateMethod() {
+				system.out.println("Method with fixed Rate");
+			}
+
+		fixed delay 
+
+			@Scheduled(fixedDelay = 60000)
+				public void fixedDelayMethod() {
+				system.out.println("Method with fixed delay");
+			}
+
+
+			second(0-59) / minutes(059) / heure(0-23) / jour(0-31) / mois(0-12 or JAN-DEC) / jour de semaine (0-7 or MON-SUN)
+
+			@Scheduled(cron = "*/60 * * * * *" )
+				public void cronMethod() {
+				system.out.println("Method with cron expression");
+			}
+
+
+
 Swagger integration for testing : 
 
 	@EnableSwagger2 <--- dans la class main
