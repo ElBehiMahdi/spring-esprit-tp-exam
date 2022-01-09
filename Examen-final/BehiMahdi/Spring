@@ -443,26 +443,47 @@ CRON :
 
 Swagger integration for testing :
 
+		<dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId> springfox-boot-starter </artifactId>
+            <version> 3.0.0 </version>
+        </dependency>
+
 	@EnableSwagger2 <--- dans la class main
-	@SpringbootApplication 
+	@SpringbootApplication
 
 	configuration package containing SwaggerConfig class:
 
 		@Configuration
 		public class SwaggerConfig {
-			@Bean
-			public Docket api() {
-				return new Docket(DocumentationType.SWAGGER_2)
-				.select()
-		 		.apis(RequestHandlerSelectors.any())
-		 		.paths(PathSelectors.any())
-		 		.build();
-		 }
-		}
+	    	@Bean
+		    public Docket api() {
+		        return new Docket(DocumentationType.SWAGGER_2)
+		                .select()
 
-	test swagger by inputing : http://localhost:8089/SpringMVC/v2/api-docs
+		                //.apis(RequestHandlerSelectors.any()) //any: documenter toutes les classes dans tous les   packages
 
-	test swagger ui : http://localhost:8089/SpringMVC/swagger-ui/index.html
+		                .apis(RequestHandlerSelectors.basePackage("tn.esprit.behimahdi")) //basePackage permet de demander à Swagger de ne rien documenter en dehors du package "com.esprit.examen".
+
+		                .paths(PathSelectors.any())
+
+		                //.paths(PathSelectors.regex("/SpringMVC/client.*")) // accepte seulement les URIs qui commençent client.
+
+		                .build().apiInfo(apiInfo());//Informations personnalisées
+		        		//.build();
+	    		}
+
+
+		    private ApiInfo apiInfo() {
+		        return new ApiInfoBuilder()
+		                .title("Swagger Configuration for EXAMEN")
+		                .description("\"Spring Boot Swagger configuration\"")
+		                .version("1.1.0")
+		                .build();
+		    }
+	   	}
+
+	test swagger by inputing : http://localhost:8089/SpringMVC/swagger-ui/index.html
  
 	Informations personnalisées : 
 

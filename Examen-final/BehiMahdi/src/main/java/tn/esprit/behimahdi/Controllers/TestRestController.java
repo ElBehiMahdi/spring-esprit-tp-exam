@@ -1,5 +1,6 @@
 package tn.esprit.behimahdi.Controllers;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +12,13 @@ import java.util.Date;
 @RequestMapping("/client")
 public class TestRestController {
 
+    //ACCESS SWAGGER
+    //http://localhost:8089/SpringMVC/swagger-ui/index.html
+
     @Autowired
     TestService clientService;
+
+
 
 
 
